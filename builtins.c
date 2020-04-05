@@ -23,3 +23,14 @@ void *echo(char *str)
 		printf("%s", str);
 	}
 }
+
+/**
+  *
+  *
+  *
+  *
+  */
+void *_ls(void)
+{
+
+}
