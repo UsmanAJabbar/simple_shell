@@ -1,4 +1,8 @@
 #include "implicit_declarations_HQ.h"
+#define FORK_F printf("Failed to fork PID\n")
+#define WAITPID waitpid(child, &pidstatus, WUNTRACED)
+#define EXEC (status = execve(args[0], args, NULL))
+#define EXEC_F dprintf(STDERR_FILENO, "%s: not found\n", args[0])
 
 /**
  * main - a simple shell program that
@@ -8,17 +12,15 @@
 int main(void)
 {
 	char *args[64]; /* Array that would store argv inputs */
-	char *splitted; /* Temp for each argv returned by strtok */
-	char *buf; /* Empty buffer for Getline to use */
+	char *buf = NULL, *splitted; /* Buf for getline | Temp for each strtok argv */
 	size_t len = 0; /* Getline will handle realloc */
-	int bytes, status, index; /*Stores ? bytes (getline) | execve status | index*/
+	int bytes, status, index, pidstatus; /*Stores ? strlen | exec status | index*/
+	pid_t child; /* Generates and saves the child PID status */
 
 	printf("$ "); /* Get the inital dollar sign */
 	/* Getline reads (aka copies) everything from stdin into buf */
 	while ((bytes = getline(&buf, &len, stdin)) > 0)
 	{
-		if (bytes == -1) /* Check if getline failed */
-			dprintf(STDERR_FILENO, "Unable to enter the shell\n"), free(buf), exit(95);
 		buf[bytes - 1] = '\0'; /* Replaces /n with '\0' */
 
 		/* Generate *argv[]s */
@@ -27,13 +29,9 @@ int main(void)
 			args[index] = splitted, splitted = strtok(NULL, " ");
 		args[index] = '\0';
 
-		/* execute it */
-		status = execve(args[0], args, NULL); /* Save int return from execve */
-		if (status == -1) /* Check if execve failed */
-			dprintf(STDERR_FILENO, "%s: No such file or directory\n", args[0]), exit(96);
-
-		/* Get the dollar sign for the the next prompt */
-		printf("$ ");
+		/* Create a child process, execute it, reset status on fail */
+		((child = fork()) < 0) ? FORK_F : (child == 0) ? EXEC : WAITPID;
+		(status < 0) ? EXEC_F, printf("$ "), status = 0 : printf("$ ");
 	}
 	return (0);
 }

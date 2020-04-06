@@ -6,10 +6,9 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-
-char **splitter(char *str, char *delimiter);
 
 #endif
