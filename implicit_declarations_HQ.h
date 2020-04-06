@@ -10,5 +10,10 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
+
+char *_strcat(char *dest, char *src);
+int _strlen(char *string);
+int _strncmp(char *first, char *second, int limit);
 
 #endif
