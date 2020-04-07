@@ -11,6 +11,29 @@ char *_strcat(char *dest, char *src)
 	return (dest);
 }
 
+char *addbin(char *str)
+{
+	char *newstring;
+	char *bin = "/bin/";
+	int index, jindex;
+
+	if (str == NULL)
+	{
+		perror("String's empty\n");
+		return (NULL);
+	}
+
+	/* Copying /bin/ into the new string */
+	for (index = 0; bin[index] != '\0'; index++)
+		newstring[index] = bin[index];
+
+	/* Cat argv[0] into the new string */
+	for (jindex = 0; str[jindex] != '\0'; index++, jindex++)
+		newstring[index] = str[jindex];
+
+	return (newstring);
+}
+
 int _strlen(char *string)
 {
 	int index;
@@ -41,25 +64,4 @@ int _strncmp(char *first, char *second, int limit)
 		}
 	}
 	return (0); /* Both of the strings matches upto len defined by limit */
-}
-/**
- * _memset - takes value from pointer s
- * replaces with values from b
- * @b: var that needs to be replaced
- * @n: number of bytes/characters to be reassigned
- * @s: pointer contains value stored in s.
- * Return: Returns new value to pointer s
- */
-char *_memset(char *s, char b, unsigned int n)
-{
-	char *r = s;
-
-	while (n > 0)
-	{
-		*s = b;
-		s++;
-		n--;
-	}
-
-return (r);
 }
