@@ -1,3 +1,5 @@
+#include "implicit_declarations_HQ.h"
+
 /**
  * ctrlc - void function that takes the singal interrupt (aka Ctrl-C)
  * and loads it onto the wrong plane
