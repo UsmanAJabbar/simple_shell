@@ -1,5 +1,12 @@
 #include "implicit_declarations_HQ.h"
 
+#define FORK_F write(1, "Failed to fork PID\n", 20)
+#define WAITPID waitpid(child, &pidstatus, WUNTRACED)
+#define EXEC (execstatus = execve(args[0], args, NULL))
+#define EXEC_F dprintf(STDERR_FILENO, "%s: not found\n", args[0])
+#define PROMPT "$ "
+#define CHILDSTATUS (child = fork())
+
 /**
  * main - a simple shell program that
  * runs user inputs, parses, and executes them
@@ -8,32 +15,38 @@
 int main(void)
 {
 	char *args[64]; /* Array that would store argv inputs */
-	char *splitted; /* Temp for each argv returned by strtok */
-	char *buf; /* Empty buffer for Getline to use */
+	char *in = NULL, *splitted, *envar; /* Buf for getline |Temp for each strtok argv*/
 	size_t len = 0; /* Getline will handle realloc */
-	int bytes, status, index; /*Stores ? bytes (getline) | execve status | index*/
+	int bytes, execstatus, index, pidstatus; /*Stores ? strlen|execstatus|index*/
+	pid_t child; /* Generates and saves the child PID status */
 
-	printf("$ "); /* Get the inital dollar sign */
-	/* Getline reads (aka copies) everything from stdin into buf */
-	while ((bytes = getline(&buf, &len, stdin)) > 0)
+	signal(SIGINT, ctrlc); /* Blocks Ctrl-C Exit */
+	while (1)
 	{
-		if (bytes == -1) /* Check if getline failed */
-			dprintf(STDERR_FILENO, "Unable to enter the shell\n"), free(buf), exit(95);
-		buf[bytes - 1] = '\0'; /* Replaces /n with '\0' */
+		write(1, "initial $ ", 10); /* Get the inital dollar sign */
+
+		/* Getline reads (aka copies) everything from stdin into input */
+		if ((bytes = getline(&in, &len, stdin)) < 0)
+			break;
+		else
+			in[bytes - 1] = '\0';
+
+		/* Check if in captured "exit" */
+		if (_strncmp(in, "exit", 4) == 0)
+			free(in), exit(0);
 
 		/* Generate *argv[]s */
-		splitted = strtok(buf, " ");
-		for (index = 0; splitted != NULL; index++)
+		for (index = 0, splitted = strtok(in, " "); splitted != NULL; index++)
 			args[index] = splitted, splitted = strtok(NULL, " ");
-		args[index] = '\0';
+		args[index] = NULL;
 
-		/* execute it */
-		status = execve(args[0], args, NULL); /* Save int return from execve */
-		if (status == -1) /* Check if execve failed */
-			dprintf(STDERR_FILENO, "%s: No such file or directory\n", args[0]), exit(96);
+		addpath(args[0]);
 
-		/* Get the dollar sign for the the next prompt */
-		printf("$ ");
+		/* Create a child process, execute it, reset status on fail */
+		(CHILDSTATUS < 0) ? FORK_F : (child > 0) ? WAITPID : EXEC;
+		if (execstatus < 0)
+			EXEC_F, execstatus = 0;
 	}
+	write(1, "\n", 1), free(in), exit(pidstatus);
 	return (0);
 }
