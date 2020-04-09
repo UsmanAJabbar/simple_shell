@@ -63,9 +63,9 @@ int _strncmp(char *first, char *second, int limit)
 /* if argv[0] has a "./", do not append the path
 /* environ function is present in the header */
 
-char **addpath(char **str)
+char **addpath(char *str[])
 {
-	char **pathappended, *patharg, *seppaths[32];
+	char *pathappended[10], *patharg, *seppaths[32];
 	int index, jindex;
 	struct stat buffer;
 	/* environ declared in header */
