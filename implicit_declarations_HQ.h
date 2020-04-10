@@ -21,7 +21,7 @@ char *_strcat(char *dest, char *src);
 int _strlen(char *string);
 int _strncmp(char *first, char *second, int limit);
 char *newcat(char *dest, char *src);
-char *addpath(char *str);
+char *addpath(char *cmd, char *envar);
 
 /* Declarations for signal.c */
 void ctrlc(int name);

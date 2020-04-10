@@ -27,21 +27,22 @@ int main(void)
 
 		/* Getline reads (aka copies) everything from stdin into input */
 		if ((bytes = getline(&in, &len, stdin)) < 0)
-			break;
+			write(1, "\n", 1), free(in), exit(0);
 		else
 			in[bytes - 1] = '\0';
 
 		/* Check if in captured "exit" */
 		if (_strncmp(in, "exit", 4) == 0)
-			break;
+			free(in), exit(0);
 
 		/* Generate *argv[]s */
 		for (index = 0, splitted = strtok(in, " "); splitted != NULL; index++)
 			args[index] = splitted, splitted = strtok(NULL, " ");
 		args[index] = NULL;
 
-		cmd = addpath(args[0]);
-		printf("Add path recieved %s for argv[0]\n", args[0]);
+		printf("argv[0] has ""%s"" before appending the path\n", args[0]);
+		cmd = addpath(args[0], "PATH=");
+		printf("Addpath function returned %s for argv[0]\n", cmd);
 
 		/* Create a child process, execute it, reset status on fail */
 		(CHILDSTATUS < 0) ? FORK_F : (child > 0) ? WAITPID : EXEC;
