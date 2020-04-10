@@ -2,7 +2,7 @@
 
 #define FORK_F write(1, "Failed to fork PID\n", 20)
 #define WAITPID waitpid(child, &pidstatus, WUNTRACED)
-#define EXEC (execstatus = execve(args[0], args, NULL))
+#define EXEC (execstatus = execve(cmd, args, NULL))
 #define EXEC_F dprintf(STDERR_FILENO, "%s: not found\n", args[0])
 #define PROMPT "$ "
 #define CHILDSTATUS (child = fork())
@@ -15,7 +15,7 @@
 int main(void)
 {
 	char *args[64]; /* Array that would store argv inputs */
-	char *in = NULL, *splitted; /* Buf for getline |Temp for each strtok argv*/
+	char *in = NULL, *splitted, *cmd; /* Buf for getline |Temp for each strtok argv*/
 	size_t len = 0; /* Getline will handle realloc */
 	int bytes, execstatus, index, pidstatus; /*Stores ? strlen|execstatus|index*/
 	pid_t child; /* Generates and saves the child PID status */
@@ -33,17 +33,15 @@ int main(void)
 
 		/* Check if in captured "exit" */
 		if (_strncmp(in, "exit", 4) == 0)
-		{
-			signal(SIGKILL, ctrlc);
 			break;
-		}
 
 		/* Generate *argv[]s */
 		for (index = 0, splitted = strtok(in, " "); splitted != NULL; index++)
 			args[index] = splitted, splitted = strtok(NULL, " ");
 		args[index] = NULL;
 
-		addpath(args[0]);
+		cmd = addpath(args[0]);
+		printf("Add path recieved %s for argv[0]\n", args[0]);
 
 		/* Create a child process, execute it, reset status on fail */
 		(CHILDSTATUS < 0) ? FORK_F : (child > 0) ? WAITPID : EXEC;
