@@ -10,5 +10,5 @@
 void ctrlc(int name)
 {
 	(void)name;
-	write(1, "\n$ ", 1);
+	write(1, "\n$ ", 1024);
 }

@@ -15,7 +15,7 @@
 int main(void)
 {
 	char *args[64]; /* Array that would store argv inputs */
-	char *in = NULL, *splitted, *envar; /* Buf for getline |Temp for each strtok argv*/
+	char *in = NULL, *splitted; /* Buf for getline |Temp for each strtok argv*/
 	size_t len = 0; /* Getline will handle realloc */
 	int bytes, execstatus, index, pidstatus; /*Stores ? strlen|execstatus|index*/
 	pid_t child; /* Generates and saves the child PID status */
@@ -33,7 +33,10 @@ int main(void)
 
 		/* Check if in captured "exit" */
 		if (_strncmp(in, "exit", 4) == 0)
-			free(in), exit(0);
+		{
+			signal(SIGKILL, ctrlc);
+			break;
+		}
 
 		/* Generate *argv[]s */
 		for (index = 0, splitted = strtok(in, " "); splitted != NULL; index++)

@@ -1,4 +1,5 @@
 #include "implicit_declarations_HQ.h"
+#include <strings.h>
 
 /**
  * _strcat - concats two strings
@@ -60,21 +61,22 @@ int _strncmp(char *first, char *second, int limit)
 /* Take argv[0] to another function and append PATH env var to it */
 /* This function should be able to accept ** and should return ** if */
 /* argv[0] is an executable in any of the paths */
-/* if argv[0] has a "./", do not append the path
+/* if argv[0] has a "./", do not append the path */
 /* environ function is present in the header */
 
-char **addpath(char *str[])
+
+char *addpath(char *str)
 {
-	char *pathappended[10], *patharg, *seppaths[32];
-	int index, jindex;
+	char *pathappended, *patharg, *pointer, *seppaths[32];
+	int index, jindex, kindex;
 	struct stat buffer;
 	/* environ declared in header */
 
-	if (*str == NULL)
+	if (str == NULL)
 		return (NULL);
 
 	/* if ./ is present in argv[0] return the original string */
-	if (_strncmp(*str, "./", 2) == 0)
+	if (_strncmp(str, "./", 2) == 0)
 		return (str); /* Returning a double pointer */
 
 	/* Loop through environ until the first five characters are PATH= */
@@ -82,27 +84,32 @@ char **addpath(char *str[])
 		if(_strncmp(environ[index], "PATH=", 5) == 0)
 			break;
 
-	printf("Got to PATH, here's what's in it\n: %s", environ[index]);
 
 	/* Break the PATH= line into argvs */
 	/* Continously save all possible paths into seppaths[]*/
 	patharg = strtok(environ[index], ":");
-	for (index = 0; patharg != NULL; index++)
-		seppaths[index] = patharg, patharg = strtok(NULL, ":");
-	seppaths[index] = NULL;
+	for (jindex = 0; patharg != NULL; jindex++)
+		seppaths[jindex] = patharg, patharg = strtok(NULL, ":"), printf("seppaths tried: %s\n", seppaths[jindex]);
+	seppaths[jindex] = NULL;
+	pointer = strcat(seppaths[0], str);
+	printf("Strcat appends: %s\n", pointer);
 
 	/* Now that we're at PATH=[index], begin testing whether agrv[0] */
 	/* is an executable in one of the paths */
 	/* index through our seperated paths until one clicks! */
-	for (index = 0, jindex = 0; seppaths[index] != NULL; index++)
+	for (kindex = 0; seppaths[kindex] != NULL; kindex++)
 	{
 		/* if ("PATH", "cmd") match  cat them and return the appended str */
-		if (stat((_strcat(seppaths[index], str[jindex])), &buffer) == 0)
+		if (stat((_strcat(seppaths[kindex], str)), &buffer) == 0)
 		{
-			pathappended[jindex] = _strcat(seppaths[index], *str);
+			pathappended = _strcat(seppaths[kindex], str);
+			printf("Catted String: %s\n", seppaths[kindex]);		
 			return (pathappended); /* Returning a double pointer */
 		}
 		else
 			continue;
 	}
+	pointer = strcat(seppaths[0], str);
+	printf("Strcat appends2: %s\n", pointer);
+	return (str);
 }
