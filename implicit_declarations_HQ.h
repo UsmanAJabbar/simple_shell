@@ -20,7 +20,6 @@ extern char **environ;
 char *_strcatl(char *dest, char *src);
 int _strlen(char *string);
 int _strncmp(char *first, char *second, int limit);
-char *newcat(char *dest, char *src);
 char *addpath(char *cmd, char *envar);
 
 /* Declarations for signal.c */
