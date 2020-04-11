@@ -2,11 +2,10 @@
 
 #define FORK_F write(1, "Failed to fork PID\n", 20)
 #define WAITPID waitpid(child, &pidstatus, WUNTRACED)
-#define EXEC (execstatus = execve(cmd, args, NULL))
+#define EXEC (execstatus = execve(addpath(args[0], "PATH="), args, environ))
 #define EXEC_F dprintf(STDERR_FILENO, "%s: not found\n", args[0])
-#define PROMPT "$ "
 #define CHILDSTATUS (child = fork())
-
+#define GETLINE (bytes = getline(&in, &len, stdin))
 /**
  * main - a simple shell program that
  * runs user inputs, parses, and executes them
@@ -15,7 +14,7 @@
 int main(void)
 {
 	char *args[64]; /* Array that would store argv inputs */
-	char *in = NULL, *splitted, *cmd; /* Buf for getline |Temp for each strtok argv*/
+	char *in = NULL, *tokens, *cmd; /* Buf for getline |Temp for each strtok argv*/
 	size_t len = 0; /* Getline will handle realloc */
 	int bytes, execstatus, index, pidstatus; /*Stores ? strlen|execstatus|index*/
 	pid_t child; /* Generates and saves the child PID status */
@@ -24,9 +23,8 @@ int main(void)
 	while (1)
 	{
 		write(1, "initial $ ", 10); /* Get the inital dollar sign */
-
 		/* Getline reads (aka copies) everything from stdin into input */
-		if ((bytes = getline(&in, &len, stdin)) < 0)
+		if (GETLINE < 0)
 			write(1, "\n", 1), free(in), exit(0);
 		else
 			in[bytes - 1] = '\0';
@@ -36,19 +34,17 @@ int main(void)
 			free(in), exit(0);
 
 		/* Generate *argv[]s */
-		for (index = 0, splitted = strtok(in, " "); splitted != NULL; index++)
-			args[index] = splitted, splitted = strtok(NULL, " ");
+		for (index = 0, tokens = strtok(in, " "); tokens != NULL; index++)
+			args[index] = tokens, tokens = strtok(NULL, " ");
 		args[index] = NULL;
 
-		printf("argv[0] has ""%s"" before appending the path\n", args[0]);
-		cmd = addpath(args[0], "PATH=");
-		printf("Addpath function returned %s for argv[0]\n", cmd);
-
 		/* Create a child process, execute it, reset status on fail */
+		/* If child returns -1, Fork Failed, Else if Child > 0, Wait */
+		/* The only case left is when child = 0, then execute */
 		(CHILDSTATUS < 0) ? FORK_F : (child > 0) ? WAITPID : EXEC;
-		if (execstatus < 0)
+		if (execstatus < 0) /* Did Exec Fail? Print fail statement */
 			EXEC_F, execstatus = 0;
 	}
-	write(1, "\n", 1), free(in), exit(pidstatus);
+	write(1, "\n", 1), free(in), exit(pidstatus); /* Cleanup Getline Buffer */
 	return (0);
 }

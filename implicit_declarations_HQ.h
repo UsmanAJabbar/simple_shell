@@ -17,7 +17,7 @@
 extern char **environ;
 
 /* Declarations for strings.c */
-char *_strcat(char *dest, char *src);
+char *_strcatl(char *dest, char *src);
 int _strlen(char *string);
 int _strncmp(char *first, char *second, int limit);
 char *newcat(char *dest, char *src);
