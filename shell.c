@@ -14,7 +14,7 @@
 int main(void)
 {
 	char *args[64]; /* Array that would store argv inputs */
-	char *in = NULL, *tokens, *cmd; /* Buf for getline |Temp for each strtok argv*/
+	char *in = NULL, *tokens; /* Buf for getline |Temp for each strtok argv*/
 	size_t len = 0; /* Getline will handle realloc */
 	int bytes, execstatus, index, pidstatus; /*Stores ? strlen|execstatus|index*/
 	pid_t child; /* Generates and saves the child PID status */

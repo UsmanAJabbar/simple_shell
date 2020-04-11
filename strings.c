@@ -33,7 +33,7 @@ char *_strcatl(char *dest, char *src)
 
 /**
  * _strlen - calculates the string length
- * @string - string
+ * @string: string input
  * Return: ? Return 0 if NULL | string length
  */
 int _strlen(char *string)
@@ -84,7 +84,7 @@ int _strncmp(char *first, char *second, int limit)
 char *addpath(char *cmd, char *envar)
 {
 	char *patharg, *seppaths[64], *fulldest, *slashcmd, *extractedenv;
-	int index, jindex, kindex;
+	int i, j, k;
 	struct stat buffer;
 	/* environ declared in header */
 
@@ -95,22 +95,22 @@ char *addpath(char *cmd, char *envar)
 		return (cmd);
 
 	/* Loop through environ until environment variable's found */
-	for (index = 0; environ[index] != NULL; index++)
-		if(_strncmp(environ[index], envar, _strlen(envar)) == 0)
+	for (i = 0; environ[i] != NULL; i++)
+		if (_strncmp(environ[i], envar, _strlen(envar)) == 0)
 			break;
 
 	/* Copy the full environment variable as a string */
-	extractedenv = _strcatl("", environ[index]);
+	extractedenv = _strcatl("", environ[i]);
 
 	/* Break the PATH= line into argvs */
-	for (jindex = 0, patharg = strtok(extractedenv, ":"); patharg != NULL; jindex++)
-		seppaths[jindex] = patharg, patharg = strtok(NULL, ":"), printf("seppaths[%d] has %s\n", jindex, seppaths[jindex]);
-	seppaths[jindex] = NULL; /* Terminate seppaths array with NULL */
+	for (j = 0, patharg = strtok(extractedenv, ":"); patharg != NULL; j++)
+		seppaths[j] = patharg, patharg = strtok(NULL, ":"), printf("seppaths[%d] has %s\n", j, seppaths[j]);
+	seppaths[j] = NULL; /* Terminate seppaths array with NULL */
 
-	/* index through our seperated paths until one clicks! */
-	for (kindex = 0, slashcmd = _strcatl("/", cmd); seppaths[kindex] != NULL; kindex++)
+	/* Index through our seperated paths until one clicks! */
+	for (k = 0, slashcmd = _strcatl("/", cmd); seppaths[k] != NULL; k++)
 	{
-		fulldest = _strcatl(seppaths[kindex], slashcmd);
+		fulldest = _strcatl(seppaths[k], slashcmd);
 		printf("Looking for %s in %s\n", slashcmd, fulldest);
 		/* if cmd+path match and is evecutable, return the string */
 		if (stat(fulldest, &buffer) == 0 && (buffer.st_mode & S_IXUSR))
