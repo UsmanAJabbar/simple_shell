@@ -16,7 +16,6 @@ char *_strcatl(char *dest, char *src)
 
 	if (dest == NULL || src == NULL)
 	{
-		free(newstring);
 		return (NULL);
 	}
 
@@ -27,7 +26,6 @@ char *_strcatl(char *dest, char *src)
 	/* Add src to the same buffer */
 	for (jindex = 0; src[jindex] != '\0'; jindex++, index++)
 		newstring[index] = src[jindex];
-
 	return (newstring);
 }
 
@@ -41,6 +39,8 @@ int _strlen(char *string)
 	int index;
 
 	/* Check if string is not null */
+	if (string == NULL)
+		return (0);
 	if (string != NULL)
 	{
 		for (index = 0; string[index] != '\0'; index++)
@@ -88,9 +88,9 @@ char *addpath(char *cmd, char *envar)
 	struct stat buffer;
 	/* environ declared in header */
 
+	/* SETTING EDGE CASES APART */
 	if (cmd == NULL)
 		return (NULL);
-	/* if ./ is present in argv[0] return the original string */
 	if (_strncmp(cmd, "./", 2) == 0 || _strncmp(cmd, "/", 1) == 0)
 		return (cmd);
 
@@ -100,27 +100,30 @@ char *addpath(char *cmd, char *envar)
 			break;
 
 	/* Copy the full environment variable as a string */
-	extractedenv = _strcatl("", environ[i]);
+	extractedenv = malloc(_strlen(environ[i]) + 1);
+	if (extractedenv == NULL)
+		free(extractedenv);
+	strcpy(extractedenv, environ[i]);
 
 	/* Break the PATH= line into argvs */
 	for (j = 0, patharg = strtok(extractedenv, ":"); patharg != NULL; j++)
-		seppaths[j] = patharg, patharg = strtok(NULL, ":"), printf("seppaths[%d] has %s\n", j, seppaths[j]);
+		seppaths[j] = patharg, patharg = strtok(NULL, ":");
 	seppaths[j] = NULL; /* Terminate seppaths array with NULL */
 
 	/* Index through our seperated paths until one clicks! */
 	for (k = 0, slashcmd = _strcatl("/", cmd); seppaths[k] != NULL; k++)
 	{
 		fulldest = _strcatl(seppaths[k], slashcmd);
-		printf("Looking for %s in %s\n", slashcmd, fulldest);
 		/* if cmd+path match and is evecutable, return the string */
 		if (stat(fulldest, &buffer) == 0 && (buffer.st_mode & S_IXUSR))
 		{
-			printf("FOUND IT HERE: %s\n", fulldest);
+			free(slashcmd);
 			free(extractedenv);
 			return (fulldest); /* Returning the appended string */
 		}
+		free(fulldest);
 	}
-	printf("DIDN'T FIND IT ANYWHERE:\n");
+	free(slashcmd);
 	free(extractedenv);
-	return (cmd);
+	return (NULL);
 }
