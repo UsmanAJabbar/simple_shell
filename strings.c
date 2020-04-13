@@ -14,10 +14,8 @@ char *_strcatl(char *dest, char *src)
 	int index, jindex;
 	char *newstring = malloc(_strlen(dest) + _strlen(src) + 1);
 
-	if (dest == NULL || src == NULL)
-	{
+	if (dest == NULL || src == NULL || newstring == NULL)
 		return (NULL);
-	}
 
 	/* Fill in newstring with dest */
 	for (index = 0; dest[index] != '\0'; index++)
@@ -26,6 +24,10 @@ char *_strcatl(char *dest, char *src)
 	/* Add src to the same buffer */
 	for (jindex = 0; src[jindex] != '\0'; jindex++, index++)
 		newstring[index] = src[jindex];
+
+	/* Close the newstring  with the null character */
+	newstring[index] = '\0';
+
 	return (newstring);
 }
 
@@ -41,13 +43,10 @@ int _strlen(char *string)
 	/* Check if string is not null */
 	if (string == NULL)
 		return (0);
-	if (string != NULL)
-	{
-		for (index = 0; string[index] != '\0'; index++)
-			;
-		return (index);
-	}
-	return (0); /* If it is null */
+
+	for (index = 0; string[index] != '\0'; index++)
+		;
+	return (index);
 }
 
 /**
@@ -72,6 +71,24 @@ int _strncmp(char *first, char *second, int limit)
 }
 
 /**
+ * _strcpy - copies string from dest to src
+ * @src: first var
+ * @dest: second var
+ * Return: returns stored value in dest
+ */
+
+char *_strcpy(char *dest, char *src)
+{
+	int i;
+
+	for (i = 0; src[i] != '\0'; i++)
+		dest[i] = src[i];
+	dest[i] = '\0';
+
+return (dest);
+}
+
+/**
  * addpath - takes in a string and searches for
  * cmd in aforementioned environment variable
  * @cmd: string with program to search for in
@@ -88,7 +105,6 @@ char *addpath(char *cmd, char *envar)
 	struct stat buffer;
 	/* environ declared in header */
 
-	/* SETTING EDGE CASES APART */
 	if (cmd == NULL)
 		return (NULL);
 	if (_strncmp(cmd, "./", 2) == 0 || _strncmp(cmd, "/", 1) == 0)
@@ -103,7 +119,7 @@ char *addpath(char *cmd, char *envar)
 	extractedenv = malloc(_strlen(environ[i]) + 1);
 	if (extractedenv == NULL)
 		free(extractedenv);
-	strcpy(extractedenv, environ[i]);
+	_strcpy(extractedenv, environ[i]);
 
 	/* Break the PATH= line into argvs */
 	for (j = 0, patharg = strtok(extractedenv, ":"); patharg != NULL; j++)
@@ -117,13 +133,11 @@ char *addpath(char *cmd, char *envar)
 		/* if cmd+path match and is evecutable, return the string */
 		if (stat(fulldest, &buffer) == 0 && (buffer.st_mode & S_IXUSR))
 		{
-			free(slashcmd);
-			free(extractedenv);
+			free(slashcmd), free(extractedenv);
 			return (fulldest); /* Returning the appended string */
 		}
 		free(fulldest);
 	}
-	free(slashcmd);
-	free(extractedenv);
+	free(slashcmd), free(extractedenv);
 	return (NULL);
 }
