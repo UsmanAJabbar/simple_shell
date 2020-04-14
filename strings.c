@@ -139,5 +139,5 @@ char *addpath(char *cmd, char *envar)
 		free(fulldest);
 	}
 	free(slashcmd), free(extractedenv);
-	return (NULL);
+	return (cmd);
 }
