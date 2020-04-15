@@ -10,7 +10,7 @@
 /**
  * main - a simple shell program that
  * runs user inputs, parses, and executes them
- * @agrc: argument count
+ * @argc: argument count
  * @argv: argument vector - used for perror for EXEC_F
  * Return: - Always 0
  */
