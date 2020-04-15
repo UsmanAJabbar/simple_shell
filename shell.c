@@ -21,22 +21,26 @@ int main(int argc __attribute__((unused)), char *argv[])
 	size_t len = 0; /* Getline will handle realloc */
 	int bytes, execstatus = 0, index, pidstatus; /*Stores?strlen|execstatus|[i]*/
 	pid_t child; /* Generates and saves the child PID status */
+	int isinteractive = 0;
 
 	signal(SIGINT, ctrlc); /* Blocks Ctrl-C Exit */
-
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-			write(1, "$ ", 2); /* Get the inital dollar sign */
+			write(1, "$ ", 2);
+		else
+			isinteractive = -1;
 
-		/* Ctrl-D pushes the PS1 to the next line */
-		if (GETLINE < 0)
-			write(1, "", 0), free(in), exit(0);
+		GETLINE; /* Call the getline function */
+		if (bytes < 0 && isinteractive == 0)
+			write(1, "\n", 1), free(in), exit(0);
+		else if (bytes < 0 && isinteractive == -1)
+			free(in), exit(0);
 		else
 			in[bytes - 1] = '\0';
 
-		/* Check if in captured "exit" */
-		if (_strncmp(in, "exit", 4) == 0)
+		/* Check if in captured "exit" or " "s are present */
+		if ((_strncmp(in, "exit", 4) == 0) || (charcheck(in) == 0))
 			free(in), exit(0);
 
 		/* Generate *argv[]s */
@@ -44,13 +48,12 @@ int main(int argc __attribute__((unused)), char *argv[])
 			args[index] = tokens, tokens = strtok(NULL, TOKENSEP);
 		args[index] = NULL;
 
-		/* Create a child process, execute it, reset status on fail */
-		/* If child returns -1, Fork Failed, Else if Child > 0, Wait */
-		/* The only case left is when child = 0, then execute */
 		(CHILDSTATUS < 0) ? FORK_F : (child > 0) ? WAITPID : EXEC;
 		if (execstatus < 0) /* Did Exec Fail? Print fail statement */
 			EXEC_F, execstatus = 0, free(in), exit(pidstatus);
+		if (isinteractive == -1)
+			free(in), exit(0);
 	}
-	/* write(1, "\n", 1), */ free(in), exit(pidstatus); /* Cleanup Getline Buffer */
+	write(1, "\n", 1), free(in), exit(pidstatus); /* Cleanup Getline Buffer */
 	return (0);
 }
