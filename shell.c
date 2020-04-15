@@ -6,12 +6,15 @@
 #define EXEC_F perror(argv[0])
 #define CHILDSTATUS (child = fork())
 #define GETLINE (bytes = getline(&in, &len, stdin))
+#define TOKENSEP " \t\n\v\r\a"
 /**
  * main - a simple shell program that
  * runs user inputs, parses, and executes them
+ * @agrc: argument count
+ * @argv: argument vector - used for perror for EXEC_F
  * Return: - Always 0
  */
-int main(int argc, char *argv[])
+int main(int argc __attribute__((unused)), char *argv[])
 {
 	char *args[64]; /* Array that would store argv inputs */
 	char *in = NULL, *tokens; /* Buf for getline |Temp for each strtok argv*/
@@ -34,8 +37,8 @@ int main(int argc, char *argv[])
 			free(in), exit(0);
 
 		/* Generate *argv[]s */
-		for (index = 0, tokens = strtok(in, " "); tokens != NULL; index++)
-			args[index] = tokens, tokens = strtok(NULL, " ");
+		for (index = 0, tokens = strtok(in, TOKENSEP); tokens != NULL; index++)
+			args[index] = tokens, tokens = strtok(NULL, TOKENSEP);
 		args[index] = NULL;
 
 		/* Create a child process, execute it, reset status on fail */
