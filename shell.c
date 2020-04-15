@@ -23,12 +23,15 @@ int main(int argc __attribute__((unused)), char *argv[])
 	pid_t child; /* Generates and saves the child PID status */
 
 	signal(SIGINT, ctrlc); /* Blocks Ctrl-C Exit */
+
 	while (1)
 	{
-		write(1, "$ ", 2); /* Get the inital dollar sign */
-		/* Getline reads (aka copies) everything from stdin into input */
+		if (isatty(STDIN_FILENO))
+			write(1, "$ ", 2); /* Get the inital dollar sign */
+
+		/* Ctrl-D pushes the PS1 to the next line */
 		if (GETLINE < 0)
-			write(1, "\n", 1), free(in), exit(0);
+			write(1, "", 0), free(in), exit(0);
 		else
 			in[bytes - 1] = '\0';
 
@@ -48,6 +51,6 @@ int main(int argc __attribute__((unused)), char *argv[])
 		if (execstatus < 0) /* Did Exec Fail? Print fail statement */
 			EXEC_F, execstatus = 0, free(in), exit(pidstatus);
 	}
-	write(1, "\n", 1), free(in), exit(pidstatus); /* Cleanup Getline Buffer */
+	/* write(1, "\n", 1), */ free(in), exit(pidstatus); /* Cleanup Getline Buffer */
 	return (0);
 }
