@@ -1,5 +1,4 @@
 #include "implicit_declarations_HQ.h"
-#include <strings.h>
 
 /**
  * _strcatl - acts just like strcat except that

@@ -3,7 +3,7 @@
 #define FORK_F write(1, "Failed to fork PID\n", 20)
 #define WAITPID waitpid(child, &pidstatus, WUNTRACED)
 #define EXEC (execstatus = execve(addpath(args[0], "PATH="), args, environ))
-#define EXEC_F dprintf(2, "%s: not found\n", args[0])
+#define EXEC_F perror(argv[0])
 #define CHILDSTATUS (child = fork())
 #define GETLINE (bytes = getline(&in, &len, stdin))
 /**
@@ -11,7 +11,7 @@
  * runs user inputs, parses, and executes them
  * Return: - Always 0
  */
-int main(void)
+int main(int argc, char *argv[])
 {
 	char *args[64]; /* Array that would store argv inputs */
 	char *in = NULL, *tokens; /* Buf for getline |Temp for each strtok argv*/
