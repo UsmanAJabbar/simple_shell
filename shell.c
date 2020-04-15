@@ -21,6 +21,7 @@ int main(int argc __attribute__((unused)), char *argv[])
 	size_t len = 0; /* Getline will handle realloc */
 	int bytes, execstatus = 0, index, pidstatus; /*Stores?strlen|execstatus|[i]*/
 	pid_t child; /* Generates and saves the child PID status */
+	int isinteractive = 0;
 
 	signal(SIGINT, ctrlc); /* Blocks Ctrl-C Exit */
 
@@ -28,10 +29,15 @@ int main(int argc __attribute__((unused)), char *argv[])
 	{
 		if (isatty(STDIN_FILENO))
 			write(1, "$ ", 2); /* Get the inital dollar sign */
+		else
+			isinteractive = -1;
 
+		GETLINE;/* Bytes < 0 + Isinteractive = 0 */
 		/* Ctrl-D pushes the PS1 to the next line */
-		if (GETLINE < 0)
-			write(1, "", 0), free(in), exit(0);
+		if (bytes < 0 && isinteractive == 0)
+			write(1, "\n", 1), free(in), exit(0);
+		else if (bytes < 0 && isinteractive == -1)
+			free(in), exit(0);
 		else
 			in[bytes - 1] = '\0';
 
@@ -50,6 +56,8 @@ int main(int argc __attribute__((unused)), char *argv[])
 		(CHILDSTATUS < 0) ? FORK_F : (child > 0) ? WAITPID : EXEC;
 		if (execstatus < 0) /* Did Exec Fail? Print fail statement */
 			EXEC_F, execstatus = 0, free(in), exit(pidstatus);
+		if (isinteractive == -1)
+			free(in), exit(0);
 	}
 	/* write(1, "\n", 1), */ free(in), exit(pidstatus); /* Cleanup Getline Buffer */
 	return (0);
