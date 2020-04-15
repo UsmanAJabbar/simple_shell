@@ -4,14 +4,13 @@
 A simple shell by Usman Abdul Jabbar and Gabriel Abdul-Raheem as a part of the Holberton School Curriculum.
 
 ## Requirements
-- Linux (Recommended)
-- gcc (>= 4.8.4)
+- Linux (Recommended) - gcc (>= 4.8.4)
 
 ## Files Required
 - shell.c
 - implicit_declarations_HQ.h
 
-| Files | Short Description | 
+| Files | Short Description |
 | --- | --- |
 | shell.c | contains all the main logic for the shell |
 | implicit_declarations_HQ.h | Contains all the headers |
