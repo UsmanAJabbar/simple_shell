@@ -26,7 +26,4 @@ char *_strcpy(char *dest, char *src);
 /* Declarations for signal.c */
 void ctrlc(int name);
 
-/* CharacterCheck */
-int charcheck(char *str);
-
 #endif
