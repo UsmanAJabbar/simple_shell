@@ -7,6 +7,7 @@
 #define CHILDSTATUS (child = fork())
 #define GETLINE (bytes = getline(&in, &len, stdin))
 #define TOKENSEP " \t\n\v\r\a"
+
 /**
  * main - a simple shell program that
  * runs user inputs, parses, and executes them
@@ -30,7 +31,6 @@ int main(int argc __attribute__((unused)), char *argv[])
 			write(1, "$ ", 2);
 		else
 			isinteractive = -1;
-
 		GETLINE; /* Call the getline function */
 		if (bytes < 0 && isinteractive == 0)
 			write(1, "\n", 1), free(in), exit(0);
@@ -38,15 +38,16 @@ int main(int argc __attribute__((unused)), char *argv[])
 			free(in), exit(0);
 		else
 			in[bytes - 1] = '\0';
-
 		/* Check if in captured "exit" or " "s are present */
-		if ((_strncmp(in, "exit", 4) == 0) || (charcheck(in) == 0))
+		if (_strncmp(in, "exit", 4) == 0)
 			free(in), exit(0);
-
 		/* Generate *argv[]s */
 		for (index = 0, tokens = strtok(in, TOKENSEP); tokens != NULL; index++)
 			args[index] = tokens, tokens = strtok(NULL, TOKENSEP);
 		args[index] = NULL;
+
+		if (args[0] == NULL || args[0] == '\0')
+			continue;
 
 		(CHILDSTATUS < 0) ? FORK_F : (child > 0) ? WAITPID : EXEC;
 		if (execstatus < 0) /* Did Exec Fail? Print fail statement */
