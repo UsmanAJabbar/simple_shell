@@ -49,11 +49,11 @@ int main(int argc __attribute__((unused)), char *argv[])
 		if (execstatus < 0) /* Did Exec Fail? Print fail statement */
 			EXEC_F, execstatus = 0, free(in), exit(pidstatus);
 		if (isatty(STDIN_FILENO))
-			write(1, "$ ", 2);
+			write(1, "$ ", 2), free(in);
 		GETLINE;
 	}
 	if (isatty(STDIN_FILENO))
-		write(1, "\n", 1),
+		write(1, "\n", 1);
 	free(in), exit(pidstatus); /* Cleanup Getline Buffer */
 	return (0);
 }
